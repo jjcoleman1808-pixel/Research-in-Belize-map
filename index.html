@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ISCR Active Research Permits Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #map { height: 100vh; width: 100vw; }
+    
+    /* Top Filter Bar */
+    .filter-bar {
+      position: absolute; top: 10px; left: 60px; z-index: 1000;
+      background: rgba(255, 255, 255, 0.95); padding: 10px 18px;
+      border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      display: flex; gap: 15px; align-items: center;
+    }
+    
+    /* Floating KPI Box */
+    .kpi-card {
+      position: absolute; top: 70px; left: 60px; z-index: 1000;
+      background: #ffffff; padding: 15px 20px; border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 220px;
+      border-left: 5px solid #0284c7;
+    }
+    .kpi-title { font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase; }
+    .kpi-value { font-size: 24px; color: #0f172a; font-weight: bold; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="filter-bar">
+    <strong style="color: #0f172a;">ISCR Research Permits (2026)</strong>
+    <select id="categoryFilter" onchange="filterMap()">
+      <option value="ALL">All Research Categories</option>
+      <option value="Marine">Blue Economy & Marine</option>
+      <option value="Culture">Culture & Indigenous Knowledge</option>
+      <option value="Ecosystems">Ecosystems & Conservation</option>
+    </select>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-title">Active Permits</div>
+    <div class="kpi-value" id="totalPermits">21</div>
+    <div style="font-size: 11px; color: #0284c7; margin-top: 5px;">ISCR-NICH Approved</div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    // Initialize map centered on Belize
+    const map = L.map('map').setView([17.1899, -88.4976], 8);
+
+    // Free OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors | ISCR-NICH'
+    }).addTo(map);
+
+    // Sample permit location clusters in Belize
+    const permitLocations = [
+      { name: "Cayo District / Belmopan", lat: 17.25, lng: -88.77, count: 6, desc: "History, Education, Youth Health & Ethnobotany" },
+      { name: "Belize District & River Valley", lat: 17.55, lng: -88.30, count: 5, desc: "Freshwater Conservation, EIA & Ocean Accounts" },
+      { name: "Caye Caulker & Reefs", lat: 17.78, lng: -88.00, count: 4, desc: "Coral Restoration & Tourism Impact" },
+      { name: "Stann Creek & Seine Bight", lat: 16.65, lng: -88.25, count: 4, desc: "Garifuna Ritual Archives & Marine Accounts" },
+      { name: "Toledo District", lat: 16.15, lng: -88.80, count: 4, desc: "Bioarchaeology, Maya Linguistics & Fisheries" },
+      { name: "Northern Belize (Corozal)", lat: 18.35, lng: -88.40, count: 2, desc: "Colonial Soil Surveys & Debt-for-Nature Swap" }
+    ];
+
+    // Add proportional bubble markers
+    permitLocations.forEach(loc => {
+      const circle = L.circleMarker([loc.lat, loc.lng], {
+        color: '#0284c7',
+        fillColor: '#38bdf8',
+        fillOpacity: 0.6,
+        radius: loc.count * 5
+      }).addTo(map);
+
+      circle.bindPopup(`
+        <div style="font-family: sans-serif;">
+          <h4 style="margin: 0 0 5px 0; color: #0f172a;">${loc.name}</h4>
+          <p style="margin: 0; font-size: 12px; color: #475569;"><b>Active Permits:</b> ${loc.count}</p>
+          <p style="margin: 5px 0 0 0; font-size: 11px; color: #64748b;">${loc.desc}</p>
+        </div>
+      `);
+    });
+  </script>
+</body>
+</html>
